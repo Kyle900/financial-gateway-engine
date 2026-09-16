@@ -1,0 +1,9 @@
+target/
+.settings/
+.project
+.classpath
+.DS_Store
+*.mv.db
+*.trace.db
+bizdb*
+batchdb*
