@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.financial.gateway.mapper.SettlementMapper">
+
+    <insert id="insertTransaction">
+        INSERT INTO TB_FIN_TRANSACTION (TX_ID, ACC_NO_ENC, AMOUNT, STATUS, BIZ_CODE, CREATED_AT)
+        VALUES (#{txId}, #{accNoEnc}, #{amount}, #{status}, #{bizCode}, CURRENT_TIMESTAMP)
+    </insert>
+
+    <select id="countPendingTransactions" resultType="int">
+        SELECT COUNT(*) FROM TB_FIN_TRANSACTION WHERE STATUS = 'PENDING'
+    </select>
+
+    <update id="updateSettledStatus">
+        UPDATE TB_FIN_TRANSACTION
+        SET STATUS = 'SETTLED'
+        WHERE STATUS = 'PENDING'
+    </update>
+
+    <!-- Tasklet Set-based Bulk Update: DB 엔진 레벨에서 일괄 상태 전이 -->
+    <update id="bulkUpdatePendingToSettled">
+        UPDATE TB_FIN_TRANSACTION
+        SET STATUS = 'SETTLED'
+        WHERE STATUS = 'PENDING'
+          AND BIZ_CODE = #{bizCode}
+    </update>
+
+    <insert id="insertSettlementLog">
+        INSERT INTO TB_SETTLEMENT_LOG (JOB_ID, TARGET_DATE, PROCESSED_COUNT, STATUS, EXECUTED_AT)
+        VALUES (#{jobId}, #{targetDate}, #{processedCount}, #{status}, CURRENT_TIMESTAMP)
+    </insert>
+
+</mapper>
